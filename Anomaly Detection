@@ -1,0 +1,26 @@
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.ensemble import IsolationForest
+
+# Let's assume 'data' is your DataFrame and it has a column 'narrative' which contains the false positive narratives
+
+# Convert the narratives to a matrix of TF-IDF features
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(data['narrative'])
+
+# Initialize Isolation Forest
+iso_forest = IsolationForest(n_estimators=100, contamination=0.01, random_state=42)
+
+# Fit the model
+iso_forest.fit(X)
+
+# Predictions
+# The Isolation Forest will return -1 for outliers and 1 for inliers
+scores_pred = iso_forest.decision_function(X)
+is_anomaly = iso_forest.predict(X)
+
+# Add the scores and predictions to the DataFrame
+data['scores'] = scores_pred
+data['is_anomaly'] = is_anomaly
+
+# Filter out the outliers for further analysis
+outliers = data[data['is_anomaly'] == -1]
