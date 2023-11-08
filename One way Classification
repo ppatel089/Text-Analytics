@@ -1,0 +1,17 @@
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.svm import OneClassSVM
+
+# Assuming 'data' is your DataFrame with a 'narrative' column containing the false positive narratives
+
+# Convert the narratives to a matrix of TF-IDF features
+vectorizer = TfidfVectorizer()
+X = vectorizer.fit_transform(data['narrative'])
+
+# Train a one-class SVM
+oc_svm = OneClassSVM(gamma='auto').fit(X)
+
+# Predict anomalies (in this case, looking for non-false-positive instances, which would be anomalies in this dataset)
+predictions = oc_svm.predict(X)
+
+# Filter out the anomalies (which could potentially be true positives or different kinds of false positives)
+anomalies = data[predictions == -1]
